@@ -1,13 +1,14 @@
 from dialog_bot_sdk.bot import DialogBot
 import grpc
 import os
+from logic import predict_state
 
 
 def on_msg(*params):
     print('on msg', params)
     bot.messaging.send_message(
-        params[0].peer, 'Reply to : ' + str(params[0].message.textMessage.text)
-    )
+        params[0].peer, predict_state(params[0].peer.id, str(params[0].message.textMessage.text))[0])
+
 
 
 if __name__ == '__main__':
