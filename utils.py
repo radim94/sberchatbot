@@ -57,3 +57,47 @@ def write_message_to_txt(user_id, message:str, state:str):
     path_to_mess1 = os.path.join(path_to_chats, filename)
     with open(path_to_mess1, 'w',encoding="utf-8") as file_2: # ����  � ��� ������ �����
         file_2.write('message='+message+'\nstate='+str(state)) # ���������� ��� ��� � ���������� � ����� ����
+
+
+
+
+def read_properties():
+    # default_propeties
+    jenkins_host = "http://localhost:8080"
+    bitbucket_host = "http://localhost:7990"
+    #####################################################################
+
+    separator = "="
+    keys = {}
+    filename ="bot.properties"
+    #############################################
+
+
+    path_to_mess1 = filename
+
+
+    #with open(path_to_mess,'rw',encoding='utf-8') as f:
+    if os.path.exists(path_to_mess1):
+        with open (path_to_mess1,'r',encoding='utf-8') as f:
+            #f.seek(0, 0)
+            for line in f:
+                #logging.info('line='+line)
+                if separator in line:
+                # Find the name and value by splitting the string
+                    name, value = line.split(separator, 1)
+                    #name=''.join(rfindall("[a-z]+",name))
+
+                # Assign key value pair to dict
+                # strip() removes white space from the ends of strings
+                    keys[name.strip()] = value.strip()
+            jenkins_host = str(keys['JENKINS_HOST'])
+            bitbucket_host = str(keys['skype_bot_password'])
+
+            print("We read next properties: jenkins_host="+jenkins_host)
+            print("We read next properties: bitbucket_host=" + bitbucket_host)
+
+
+
+    return jenkins_host, bitbucket_host
+        #{"JENKINS_HOST": jenkins_host,
+         #   "BITBUCKET_HOST": bitbucket_host}

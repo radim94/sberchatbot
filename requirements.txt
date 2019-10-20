@@ -3,3 +3,6 @@ logging
 os
 dialog-api
 dialog-bot-sdk
+jenkisapi
+requests
+stashy
