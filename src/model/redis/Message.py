@@ -12,7 +12,7 @@ class Message(Model):
     __database__ = db
     __namespace__ = 'messages'
 
-    id = UUIDField(primary_key=True)
+    id = IntegerField(primary_key=True)
     user_id = UUIDField(index=True)
     chatid = TextField()
 

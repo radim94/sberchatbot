@@ -8,7 +8,7 @@ class User(Model):
     __namespace__ = 'user'
 
 
-    id = UUIDField(primary_key=True)
+    id = IntegerField(primary_key=True)
     name = TextField()
     chatid = TextField()
     phone = TextField(index=True)
@@ -35,7 +35,8 @@ class User(Model):
 
 if __name__ == "__main__":
 
-    usr_dct = {'name': 'test',
+    usr_dct = {'id':1481,
+        'name': 'test',
                # 'chatid': 'test',
                # 'phone': 'test',
                'is_blocked': False,
@@ -47,7 +48,6 @@ if __name__ == "__main__":
                'jira_user_id': 'test',
                'jenkins_user_id': 'test'}
     User.create(**usr_dct)
-
 
 
     for user in User.all():
