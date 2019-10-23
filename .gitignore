@@ -126,3 +126,7 @@ dmypy.json
 
 # logs
 /logs/*
+
+#idea
+.idea
+.idea/*
