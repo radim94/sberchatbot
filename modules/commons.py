@@ -10,4 +10,6 @@ def answer_help(args, answer):
 def answer_unknown(args, answer):
     answer.text = "Не понял, чего тебе надо?"
 
+def answer_select(args, answer):
+    answer.selects=({'tasks TEST-8': 'TEST-8'}, "Tasks")
 

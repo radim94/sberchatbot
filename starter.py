@@ -10,6 +10,7 @@ from dialog_bot_sdk import interactive_media
 from stashy.pullrequests import PullRequest
 
 from bitbucket_Api.common_bb import *
+from text_commands import find_command, load_answer_functions, COMMAND_UNKNOWN, do_command
 
 user_states = defaultdict(State)
 
@@ -49,7 +50,7 @@ def add_interactive(media_id, text, type_='button'):
             media_id,
             interactive_media.InteractiveMediaButton(str(media_id), text)
         )
-    if type_ == 'list':
+    if type_ == 'list' or type_ == 'select':
         return interactive_media.InteractiveMedia(
             media_id,
             interactive_media.InteractiveMediaSelect(text, media_id)
@@ -206,17 +207,29 @@ def get_message_state(state, choise):
 
 def on_message(msg_):
     user, message = get_user_message(msg_)
-    state = user_states[user.id]
+    # state = user_states[user.id]
 
-    choise = get_choise(message, state)
+    # choise = get_choise(message, state)
 
     try:
-        new_state, answer, interactive_answer = get_message_state(state, choise)
-        user_states[user.id] = new_state
-        if len(interactive_answer) != 0:
-            bot.messaging.send_message(user, answer, interactive_answer)
+        command = find_command(message)
+        if command !=COMMAND_UNKNOWN:
+            answer = do_command(command)
+
+        group=[]
+        if answer.selects is not None:
+            group.append(add_interactive(answer.selects[1], answer.selects[0], type_='select'))
+        group.extend([add_interactive(button['label'],button['value']) for button in answer.buttons])
+
+        answer_text=answer.text
+        if answer_text is None or len(answer_text)==0 or answer_text==" ":
+            answer_text=' '
+        if len(group) != 0:
+            interactive_answer = [interactive_media.InteractiveMediaGroup(group)]
+            bot.messaging.send_message(user, answer_text, interactive_answer)
         else:
-            bot.messaging.send_message(user, answer)
+            bot.messaging.send_message(user, answer_text)
+
     except Exception as e:
         print(e)
         bot.messaging.send_message(user, 'ERROR')
@@ -226,6 +239,7 @@ def on_message(msg_):
 
 
 if __name__ == '__main__':
+    load_answer_functions()
     bot = DialogBot.get_secure_bot(
         'hackathon-mob.transmit.im:443',
         grpc.ssl_channel_credentials(),
