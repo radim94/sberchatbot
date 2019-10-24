@@ -1,6 +1,5 @@
-re
-logging
-os
+redis==3.3.11
+walrus==0.8.0
 dialog-api
 dialog-bot-sdk
 jenkisapi

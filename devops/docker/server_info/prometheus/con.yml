@@ -1,11 +1,21 @@
 groups:
-- name: ExporterDown
-  rules:
-  - alert: NodeDown
-    expr: up{job='node'} == 0
-    for: 1m
-    labels:
-      severity: Error
-    annotations:
-      summary: "Node Explorer instance ($instance) down"
-      description: "NodeExporterDown"
+  - name: ExporterDown
+    rules:
+      - alert: NodeDown
+        expr: up{job='node'} == 0
+        for: 1m
+        labels:
+          severity: Error
+        annotations:
+          summary: "{{$labels.instance}} of job {{$labels.job}} has been down for more than 1 minutes."
+          description: "NodeExporterDown"
+  - name: LowDiskSpace
+    rules:
+      - alert: DiskSpace70%Free
+        expr: (( node_filesystem_free_bytes{job="node"}  / node_filesystem_size_bytes{job="node"} )) <= 1
+        for: 1m
+        labels:
+          severity: Warning
+        annotations:
+          summary: "Instance1 {{$labels.instance}} is low on disk space"
+          description: "{{$labels.instance}}  has only {{ $value }}% free."
