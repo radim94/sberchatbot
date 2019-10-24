@@ -2,7 +2,7 @@ import grpc
 from dialog_bot_sdk import interactive_media
 from dialog_bot_sdk.bot import DialogBot
 
-from text_commands import find_command, load_answer_functions, COMMAND_UNKNOWN, do_command
+from text_commands import find_command, load_answer_functions, COMMAND_UNKNOWN, do_command, get_credentials
 
 
 def add_interactive(media_id, text, type_='button'):
@@ -35,9 +35,7 @@ def on_message(msg_):
     # choise = get_choise(message, state)
 
     try:
-        command = find_command(message)
-        if command != COMMAND_UNKNOWN:
-            answer = do_command(command)
+        answer = do_command(message,credentials=get_credentials(user.id))
 
         group = []
         if answer.selects is not None:
@@ -66,7 +64,7 @@ if __name__ == '__main__':
     bot = DialogBot.get_secure_bot(
         'hackathon-mob.transmit.im:443',
         grpc.ssl_channel_credentials(),
-        '86020643997976086d7cc80db129b4c1d4a0542c'
+        'c9c60f2d3ff65c01c4ca0ed340c1ea64d110af8a'
     )
     # print(bot.users.get_user_full_profile_by_nick('asavt'))
     bot.messaging.on_message(on_message, on_message)

@@ -19,11 +19,14 @@ user='admin'
 stash = stashy.connect("http://172.30.18.187:7990", user,token)
 stash
 print(stash.projects.list())
-def project_list():
+def project_list(credentials):
+    stash=stashy.connect("http://172.30.18.187:7990", credentials['login'] ,credentials['password'])
     return stash.projects.list()
-def repo_list(proj):
+def repo_list(proj,credentials):
+    stash = stashy.connect("http://172.30.18.187:7990", credentials['login'], credentials['password'])
     return stash.projects[proj].repos.list()
-def PR_list():
+def PR_list(credentials):
+    stash = stashy.connect("http://172.30.18.187:7990", credentials['login'], credentials['password'])
     return stash.dashboard.pull_request.list()
 
 @dataclass
