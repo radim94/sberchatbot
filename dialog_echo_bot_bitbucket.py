@@ -42,11 +42,17 @@ def get_init_message(state):
     return message, message_int
 
 
-def add_interactive(media_id, text):
-    return interactive_media.InteractiveMedia(
-        media_id,
-        interactive_media.InteractiveMediaButton(str(media_id), text)
-    )
+def add_interactive(media_id, text, type_='button'):
+    if type_ == 'button':
+        return interactive_media.InteractiveMedia(
+            media_id,
+            interactive_media.InteractiveMediaButton(str(media_id), text)
+        )
+    if type_ == 'list':
+        return interactive_media.InteractiveMedia(
+            media_id,
+            interactive_media.InteractiveMediaSelect(text, media_id)
+        )
 
 
 def get_user_message(msg):
@@ -78,27 +84,41 @@ def get_message_state(state, choise):
             state.step = Steps.PROJECT_LIST
             pl = project_list()
             state.project_list = pl
-            answer = '\n'.join(str(index + 1) + ' : ' + proj['key'] for index, proj in enumerate(pl))
-            int_answer = [add_interactive(index + 1, proj['key']) for index, proj in enumerate(pl)]
+            answer = " "
+            int_answer = [
+                add_interactive('Projects',
+                                {str(index + 1): proj['key'] for index, proj in enumerate(pl)},
+                                type_='list')
+            ]
 
         if choise == 'PR':
             state.step = Steps.MANAGE_PR_OPTIONS
             prs = [pr for pr in PR_list() if pr['state'] == 'OPEN']
             state.pr_list = prs
-            answer = '\n'.join(str(index + 1) + ' : ' + pr['title'] for index, pr in enumerate(prs))
-            int_answer = [add_interactive(index + 1, proj['title']) for index, proj in enumerate(prs)]
-            answer += '\nback'
-            int_answer.append(add_interactive('back', 'back'))
+            answer = ' '
+            int_answer = [add_interactive('PRs',
+                                          {str(index + 1): proj['title'] for index, proj in enumerate(prs)},
+                                          type_='list'),
+                          add_interactive('back', 'back')
+                          ]
         if choise == 'manage_PR':
             state.step = Steps.MANAGE_PR_OPTIONS
             return get_message_state(state, 'skip')
         if choise == 'repo':
             state.step = Steps.REPO_LIST
-            pl = project_list()
-            state.project_list = pl
-            answer = '\n'.join(str(index + 1) + ' : ' + proj['key'] for index, proj in enumerate(pl))
-            int_answer = [add_interactive(index + 1, proj['key']) for index, proj in enumerate(pl)]
-
+            pl = repo_list(state.project)
+            state.repo_list = pl
+            answer = ' '
+            int_answer = [add_interactive('Repos',
+                                          {str(index + 1): proj['slug'] for index, proj in enumerate(pl)},
+                                          type_='list'),
+                          add_interactive('back', 'back')
+                          ]
+        if choise == 'exit':
+            state=State()
+            answer=' '
+            int_answer=[]
+            return get_message_state(state, choise)
     elif state.step == Steps.MANAGE_PR_OPTIONS:
         if choise != 'back' and choise != 'skip':
             choise = int(choise)
@@ -123,41 +143,48 @@ def get_message_state(state, choise):
         ]
 
         answer = '\n'.join(str(index + 1) + ' : ' + pr for index, pr in enumerate(ans))
+        answer=' '
         int_answer = [add_interactive(proj, proj) for index, proj in enumerate(ans)]
 
         can_merge = stash.projects[state.project].repos[state.repository].pull_requests[state.pull_request].can_merge()
         if can_merge:
             answer = f'PR can be merged\n' + answer
-
-    elif state.step == Steps.PROJECT_LIST:
-        choise = int(choise)
-        if int(choise) > 0 and int(choise) <= len(state.project_list):
-            state.project = state.project_list[choise - 1]['key']
-            state.step = Steps.INIT
-            return get_message_state(state, choise)
     elif state.step == Steps.MANAGE_PR:
         pr: PullRequest
         pr = stash.projects[state.project].repos[state.repository].pull_requests[state.pull_request]
         print(choise)
         if choise == 'approve':
             pr.approve()
-        if choise == 'decline':
+        elif choise == 'decline':
             pr.decline()
-        if choise == 'merge':
+        elif choise == 'merge':
             stash.projects[state.project].repos[state.repository].pull_requests[state.pull_request].merge(version=0)
-        if choise == 'unapprove':
+        elif choise == 'unapprove':
             pr.unapprove()
-        if choise == 'get comment':
+        elif choise == 'get comment':
             return state, '\n'.join(
                 x['comment']['author']['name'] + ':' + x['comment']['text'] for x in pr.activities() if
                 x['action'] == 'COMMENTED'), []
-        if choise == 'get linked jira task':
+        elif choise == 'get linked jira task':
             return state, '\n'.join(x['key'] + '  :  ' + x['url'] for x in pr.issues()), []
         else:
             state.step = Steps.START
             return get_message_state(state, 'PR')
         state.step = Steps.INIT
         return get_message_state(state, choise)
+    elif state.step == Steps.PROJECT_LIST:
+        choise = int(choise)
+        if int(choise) > 0 and int(choise) <= len(state.project_list):
+            state.project = state.project_list[choise - 1]['key']
+            state.step = Steps.INIT
+            return get_message_state(state, choise)
+    elif state.step == Steps.REPO_LIST:
+        choise = int(choise)
+        if int(choise) > 0 and int(choise) <= len(state.project_list):
+            state.repository = state.repo_list[choise - 1]['slug']
+            state.step = Steps.INIT
+            return get_message_state(state, choise)
+
     else:
         return get_message_state(state, choise)
 
@@ -180,6 +207,7 @@ def on_message(msg_):
     except Exception as e:
         print(e)
         bot.messaging.send_message(user, 'ERROR')
+        raise e
 
     # bot.messaging.send_message(user, '<a href="http://172.30.18.111:8080/browse/TEST-1">')
 

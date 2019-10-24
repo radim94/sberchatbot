@@ -22,7 +22,7 @@ print(stash.projects.list())
 def project_list():
     return stash.projects.list()
 def repo_list(proj):
-    return stash.projects[proj].list()
+    return stash.projects[proj].repos.list()
 def PR_list():
     return stash.dashboard.pull_request.list()
 
