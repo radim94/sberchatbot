@@ -11,8 +11,16 @@ class Answer:
     buttons = ()  # ({value: "", label: ""})
 
 
-def get_answer(message):
-    return do_command(message)
+def get_credentials(user_id):
+    return {
+        'login': '1',
+        'password': '1'
+    }
+
+
+def get_answer(message, user_id):
+    credentials = get_credentials(user_id)
+    return do_command(message, credentials)
 
 
 commands = []
@@ -59,7 +67,7 @@ def distance(a, b):
     return current_row[n]
 
 
-def do_command(message):
+def do_command(message, credentials):
     params = message.split()
     command = find_command(params[0])
     args = list(params)[1:]
@@ -69,7 +77,7 @@ def do_command(message):
     function_name = 'answer_' + command
     try:
         answer_function = answer_functions[function_name]
-        answer_function(args, answer)
+        answer_function(args, answer, credentials)
     except Exception as e:
         answer.text = 'ERROR'
         print('Call for {} failed'.format(function_name))

@@ -6,6 +6,7 @@ from jira.exceptions import JIRAError
 import os
 from dialog_bot_sdk import interactive_media
 from collections import defaultdict
+from text_commands import load_answer_functions, get_answer
 
 from jira_api.logic import JIRA_UI
 from jira_api.test_jira import JIRA_API
@@ -43,11 +44,17 @@ def on_msg(*params):
 
 
 def on_msg1(*params):
+
     # print(params[0])
-    user = users_state.setdefault(params[0].peer.id, User(**user_data))
-    if user.state != State.SHOW_TASK:
-        user.task_id = None
+    # user = users_state.setdefault(params[0].peer.id, User(**user_data))
+    # if user.state != State.SHOW_TASK:
+    #     user.task_id = None
     message = params[0].message.textMessage.text.lower()
+    answer = get_answer(message, params[0].peer.id)
+    bot.messaging.send_message(
+        bot.users.get_user_outpeer_by_id(params[0].peer.id),
+        answer.text
+    )
     if message in ['посмотреть спринт', 'show sprint']:
         user.state = State.SHOW_SPRINT
         options = user.jira.get_issues_in_sprint()
@@ -55,14 +62,6 @@ def on_msg1(*params):
             bot.users.get_user_outpeer_by_id(params[0].peer.id),
             f'В спринте {len(options)} задач. Для просмотра задачи выберите её в выпадающем списке внизу',
             JIRA_UI.show_issues_in_sprint(options)
-        )
-    elif message in ['мои задачи', 'my tasks']:
-        user.state = State.SHOW_MY_TASKS
-        options = user.jira.get_assigned_issue()
-        bot.messaging.send_message(
-            bot.users.get_user_outpeer_by_id(params[0].peer.id),
-            f'У вас {len(options)} задач. Для просмотра задачи выберите её в выпадающем списке внизу',
-            JIRA_UI.show_issues(options)
         )
     elif message.startswith('assign'):
         if user.state == State.SHOW_TASK:
@@ -172,6 +171,7 @@ def on_click(*params):
 
 
 if __name__ == '__main__':
+    load_answer_functions()
     bot = DialogBot.get_secure_bot(
         'hackathon-mob.transmit.im:443',
         grpc.ssl_channel_credentials(),

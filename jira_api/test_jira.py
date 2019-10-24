@@ -6,13 +6,11 @@ class JIRA_API:
         except ImportError:
             raise IndexError('Install jira (pip install jira')
         self.obj: jira.JIRA = jira.JIRA(server=server, basic_auth=(login, password))
-        self.current_project = None
-        self.current_issue = None
 
     def get_assigned_issue(self):
         user = self.obj.current_user()
         issues = self.obj.search_issues(f'assignee={user} AND statuscategory != Done')
-        return {issue.key: f'{issue.fields.project} / {issue.key}' for issue in issues}
+        return {f'tasks {issue.key}': f'{issue.fields.project} / {issue.key}' for issue in issues}
 
     def get_issue_info(self, issue_key):
         issue = self.obj.search_issues(f'key={issue_key}')[0]
@@ -45,4 +43,6 @@ class JIRA_API:
         if not whom:
             whom = self.obj.current_user()
         issue = self.obj.search_issues(f'key={issue_key}')[0]
-        return self.obj.assign_issue(issue, whom)
+        self.obj.assign_issue(issue, whom)
+        return whom
+
