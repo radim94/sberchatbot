@@ -49,6 +49,10 @@ class AlertmanagerUserFilter(Model):
         else:
             pass
 
+    def get_text_message(self):
+        return self.label + " : " + str(self.include_values)
+
+
 if __name__ == "__main__":
 
     test = {
