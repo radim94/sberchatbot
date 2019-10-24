@@ -1,14 +1,12 @@
 from collections import defaultdict
-from dataclasses import dataclass
 
-from dialog_api import peers_pb2
-from dialog_bot_sdk.bot import DialogBot
 import grpc
-import os
 from dialog_bot_sdk import interactive_media
+from dialog_bot_sdk.bot import DialogBot
 from stashy.pullrequests import PullRequest
 
 from bitbucket_Api.common_bb import *
+
 user_states = defaultdict(State)
 
 def get_init_message(state):

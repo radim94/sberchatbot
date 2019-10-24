@@ -26,7 +26,14 @@ class JIRA_UI:
             [interactive_media.InteractiveMedia(
                 'select_task',
                 interactive_media.InteractiveMediaSelect(options, "Tasks")
-            )])]
+            )]),
+            # interactive_media.InteractiveMediaGroup([
+            #     interactive_media.InteractiveMedia(
+            #         'back',
+            #         interactive_media.InteractiveMediaButton('back', 'Назад')
+            #     )
+            # ])
+        ]
 
     @staticmethod
     def show_transition(transition):
@@ -35,3 +42,18 @@ class JIRA_UI:
                 'transition',
                 interactive_media.InteractiveMediaSelect(transition, "Transition")
             )])]
+
+    @staticmethod
+    def show_issues_in_sprint(options):
+        return [interactive_media.InteractiveMediaGroup(
+            [interactive_media.InteractiveMedia(
+                'select_task_in_sprint',
+                interactive_media.InteractiveMediaSelect(options, "Tasks")
+            )]),
+            # interactive_media.InteractiveMediaGroup([
+            #     interactive_media.InteractiveMedia(
+            #         'back',
+            #         interactive_media.InteractiveMediaButton('back', 'Назад')
+            #     )
+            # ])
+        ]
