@@ -24,6 +24,27 @@ class PrometheusLabels:
     JOB = 'job'
 
 
+class HostStatus():
+
+    def __init__(self, host, **entries):
+        self.host = host
+        self.__dict__.update(entries)
+
+    def to_message_string(self):
+        s = "HOST: " + self.host
+
+        d = [x for x in self.__dict__ if "__" not in x]
+
+        for x in d:
+
+            if x != 'host':
+                s += "\n {0} : {1}".format(x, self.__dict__[x])
+
+        return s
+
+    def __repr__(self):
+        return self.to_message_string()
+
 if __name__ == "__main__":
     print(ServerMetrics['up'])
     # prom = prometheus_api_client.PrometheusConnect()

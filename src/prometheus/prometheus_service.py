@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 import requests
 
 from src.model.prometheus.Metric import ServerLabels
+from src.prometheus.alertservice import _get_alert_list
 from src.utils.lists import get_num_or_def, get_first_or_def
 
 
@@ -18,6 +19,7 @@ class PrometheusService():
     PROMETHEUS_HOST = config.PROMETHEUS_SERVER_HOST
 
     api_labels = "http://" + PROMETHEUS_HOST + "/api/v1/label/{0}/values"
+    api_alerts = "http://" + PROMETHEUS_HOST + "/api/v1/alerts"
 
     __prom = prometheus_api_client.PrometheusConnect("http://" + config.PROMETHEUS_SERVER_HOST)
 
@@ -27,13 +29,25 @@ class PrometheusService():
     @classmethod
     def get_metric_value(self, metric_name, labels):
         res = self.__prom.get_current_metric_value(metric_name=metric_name, label_config=labels)
-        # print(res)
-        # return res.get('value', [None, None])[0]
         return res
 
     @classmethod
-    def get_alerts(self, filter):
-        pass
+    def get_alerts(cls, labels=dict()):
+        alert_message = requests.get(cls.api_alerts).json().get("data", dict())
+        alerts = _get_alert_list(alert_message)
+        res_alerts = [x for x in alerts if cls.__check_alert(x,labels)]
+        return res_alerts
+
+    @classmethod
+    def __check_alert(self,alert, labels=dict()):
+        for k in labels:
+            v = labels[k]
+            if alert.labels[k] != v:
+                return False
+        return True
+
+
+        return alerts
 
     @classmethod
     def get_label_values(cls, label):
@@ -61,6 +75,7 @@ if __name__ == "__main__":
     # print(PrometheusService.get_label_values("instance"))
 
     # print(PrometheusService.get_metric_value("up", None))
-    print(PrometheusService.get_uptime("localhost:9100"))
+    # print(PrometheusService.get_uptime("localhost:9100"))
 
+    print(PrometheusService.get_alerts())
     pass

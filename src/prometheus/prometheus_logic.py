@@ -1,4 +1,4 @@
-from src.model.prometheus.Metric import ServerLabels, ServerMetrics
+from src.model.prometheus.Metric import ServerLabels, ServerMetrics, HostStatus
 from src.model.prometheus.UserFilters import AlertmanagerUserFilter
 from src.prometheus.prometheus_service import PrometheusService
 from src.utils.lists import get_first_or_def, get_num_or_def
@@ -26,6 +26,11 @@ class PrometheusLogicService():
 
     @classmethod
     def get_host_status(cls, instance: str):
+        """
+
+        :param instance:
+        :return: HostStatus
+        """
         status_dict = dict()
         status_dict["uptime (days)"] = PrometheusService.get_uptime(instance)
 
@@ -36,8 +41,15 @@ class PrometheusLogicService():
             if value is not None:
                 status_dict[metric] = value
 
-        return status_dict
+        return HostStatus(instance, **status_dict)
 
+    @classmethod
+    def get_alert_list(cls,labels=dict()):
+        label_config = {**cls.base_label_config, **labels}
+        return PrometheusService.get_alerts(label_config)
+
+
+        return []
 
 class AlertSubscService():
 
@@ -97,4 +109,7 @@ if __name__ == "__main__":
     # for f in fl:
     #     print(f._data)
 
-    print(PrometheusLogicService.get_host_status("localhost:9100"))
+    # print(PrometheusLogicService.get_host_status("localhost:9100"))
+
+
+    print(PrometheusLogicService.get_alert_list({ServerLabels.INSTANCE: "localhost:9100"}))

@@ -1,5 +1,7 @@
 from walrus import *
 
+from src.utils.lists import get_first_or_def
+
 db = Database()
 
 
@@ -13,7 +15,6 @@ class AlertmanagerUserFilter(Model):
     __database__ = db
     __namespace__ = 'prometheus_filters'
 
-
     id = AutoIncrementField(primary_key=True)
     user_id = IntegerField(index=True)
 
@@ -21,20 +22,43 @@ class AlertmanagerUserFilter(Model):
     include_values = PickledField(default=set())
     exclude_values = PickledField(default=set())
 
+    @classmethod
+    def update_or_create(cls, user_id, label, include_value=None, exclude_value=None):
+        lst = list(AlertmanagerUserFilter.query(AlertmanagerUserFilter.user_id == user_id))
+        lst = [x for x in lst if x.label == label]
+
+        if len(lst) > 0:
+            alert_filter = get_first_or_def(lst)
+            alert_filter = AlertmanagerUserFilter.load(alert_filter.id)
+            alert_filter.include_values.add(include_value)
+            alert_filter.save()
+        else:
+            AlertmanagerUserFilter.create(user_id=user_id,label=label,include_value=set(include_value)) #TODO excledues
 
 
+    @classmethod
+    def del_label_value(cls,user_id, label, include_value=None,):
+        lst = list(AlertmanagerUserFilter.query(AlertmanagerUserFilter.user_id == user_id))
+        lst = [x for x in lst if x.label == label]
+
+        if len(lst) > 0:
+            alert_filter = get_first_or_def(lst)
+            alert_filter = AlertmanagerUserFilter.load(alert_filter.id)
+            alert_filter.include_values.remove(include_value)
+            alert_filter.save()
+        else:
+            pass
 
 if __name__ == "__main__":
 
-    test =  {
+    test = {
         # 'id':1,
-        "user_id":1481,
+        "user_id": 1481,
         'label': 'instance',
         'include_values': {'localhost:9100'}
-        }
+    }
 
     a = AlertmanagerUserFilter.create(**test)
 
     for user in AlertmanagerUserFilter.query(AlertmanagerUserFilter.user_id == 1489):
         print(user._data)
-

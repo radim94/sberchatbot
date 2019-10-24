@@ -17,7 +17,7 @@ groups:
         labels:
           severity: Warning
         annotations:
-          summary: "Instance1 {{$labels.instance}} is low on disk space"
+          summary: "Host {{$labels.instance}} is low on disk space"
           description: "{{$labels.instance}}  has only {{ $value }}% free."
   - name: example-node-exporter-rules
     rules:
