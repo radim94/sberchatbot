@@ -8,11 +8,20 @@ import traceback
 
 class Answer:
     text = None
-    buttons = ()  # ({value: "", label: ""})
+    buttons = dict()  # ({value: "", label: ""})
+    selects = tuple()
 
 
-def get_answer(message):
-    return do_command(message)
+def get_credentials(user_id):
+    return {
+        'login': '1',
+        'password': '1'
+    }
+
+
+def get_answer(message, user_id):
+    credentials = get_credentials(user_id)
+    return do_command(message, credentials)
 
 
 commands = []
@@ -23,8 +32,10 @@ COMMAND_UNKNOWN = 'unknown'
 
 def load_answer_functions_from_module(module):
     for name, obj in inspect.getmembers(module):
+        if name.startswith('__') and name.endswith('__'):
+            continue
         if inspect.isclass(obj):
-            cls.load_answer_functions_from_module(obj)
+            load_answer_functions_from_module(obj)
         elif inspect.ismethod(obj) or inspect.isfunction(obj):
             if name.startswith(ANSWER_PREFIX):
                 answer_functions[name] = obj
@@ -59,17 +70,17 @@ def distance(a, b):
     return current_row[n]
 
 
-def do_command(message):
+def do_command(message, credentials):
     params = message.split()
     command = find_command(params[0])
     args = list(params)[1:]
 
     answer = Answer()
 
-    function_name = 'answer_' + command
+    function_name = ANSWER_PREFIX + command
     try:
         answer_function = answer_functions[function_name]
-        answer_function(args, answer)
+        answer_function(args, answer, credentials)
     except Exception as e:
         answer.text = 'ERROR'
         print('Call for {} failed'.format(function_name))

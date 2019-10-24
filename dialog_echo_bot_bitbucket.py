@@ -1,5 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
+from pprint import pprint
 
 from dialog_api import peers_pb2
 from dialog_bot_sdk.bot import DialogBot
@@ -140,6 +141,7 @@ def get_message_state(state, choise):
             'unapprove',
             'get comment',
             'get linked jira task',
+            'get commits',
             'back'
         ]
 
@@ -168,6 +170,9 @@ def get_message_state(state, choise):
                 x['action'] == 'COMMENTED'), []
         elif choise == 'get linked jira task':
             return state, '\n'.join(x['key'] + '  :  ' + x['url'] for x in pr.issues()), []
+        elif choise == 'get commits':
+            pprint(list(pr.commits()))
+            return state, '\n'.join(x['author']['name'] + '  :  ' + x['displayId'] for x in pr.commits()), []
         else:
             state.step = Steps.START
             return get_message_state(state, 'PR')

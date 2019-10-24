@@ -7,7 +7,9 @@ def answer_help(args, answer):
     answer.text = "Я умный супермегабот. Набирай команды, постараюсь выполнить :=]"
 
 
-def answer_unknown(args, answer):
+def answer_unknown(args, answer,cred):
     answer.text = "Не понял, чего тебе надо?"
 
+def answer_select(args, answer):
+    answer.selects=({'tasks TEST-8': 'TEST-8'}, "Tasks")
 

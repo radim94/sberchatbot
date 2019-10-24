@@ -1,3 +1,4 @@
+jira
 re
 logging
 os
@@ -6,4 +7,3 @@ dialog-bot-sdk
 jenkisapi
 requests
 stashy
-python-jenkins
