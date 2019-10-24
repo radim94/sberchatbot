@@ -2,7 +2,7 @@ import grpc
 from dialog_bot_sdk import interactive_media
 from dialog_bot_sdk.bot import DialogBot
 
-from text_commands import find_command, load_answer_functions, COMMAND_UNKNOWN, do_command
+from text_commands import find_command, load_answer_functions, COMMAND_UNKNOWN, do_command, get_credentials
 
 
 def add_interactive(media_id, text, type_='button'):
@@ -35,12 +35,10 @@ def on_message(msg_):
     # choise = get_choise(message, state)
 
     try:
-        command = find_command(message)
-        if command != COMMAND_UNKNOWN:
-            answer = do_command(command)
+        answer = do_command(message, get_credentials(user.id))
 
         group = []
-        if answer.selects is not None:
+        if answer.selects:
             group.append(add_interactive(answer.selects[1], answer.selects[0], type_='select'))
         group.extend([add_interactive(button['label'], button['value']) for button in answer.buttons])
 

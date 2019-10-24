@@ -33,7 +33,7 @@ class JIRA_API:
 
     def get_issues_in_sprint(self):
         issues = self.obj.search_issues('sprint in openSprints()')
-        return {issue.key: f'{issue.fields.project} / {issue.key} ({issue.fields.status})' for issue in issues}
+        return {f'sprint {issue.key}': f'{issue.fields.project} / {issue.key} ({issue.fields.status})' for issue in issues}
 
     def assign_issue(self, issue_key, whom=None):
         if not whom:

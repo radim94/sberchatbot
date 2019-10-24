@@ -32,6 +32,8 @@ COMMAND_UNKNOWN = 'unknown'
 
 def load_answer_functions_from_module(module):
     for name, obj in inspect.getmembers(module):
+        if name.startswith('__') and name.endswith('__'):
+            continue
         if inspect.isclass(obj):
             load_answer_functions_from_module(obj)
         elif inspect.ismethod(obj) or inspect.isfunction(obj):
