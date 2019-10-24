@@ -1,7 +1,9 @@
+import importlib
+import inspect
 import math
+import os
 import sys
 import traceback
-from enum import Enum
 
 
 class Answer:
@@ -10,7 +12,31 @@ class Answer:
 
 
 def get_answer(message):
-    return Command.do(message)
+    return do_command(message)
+
+
+commands = []
+answer_functions = dict()
+ANSWER_PREFIX = 'answer_'
+COMMAND_UNKNOWN = 'unknown'
+
+
+def load_answer_functions_from_module(module):
+    for name, obj in inspect.getmembers(module):
+        if inspect.isclass(obj):
+            cls.load_answer_functions_from_module(obj)
+        elif inspect.ismethod(obj) or inspect.isfunction(obj):
+            if name.startswith(ANSWER_PREFIX):
+                answer_functions[name] = obj
+                commands.append(name[len(ANSWER_PREFIX):])
+
+
+def load_answer_functions():
+    module_dir = 'modules'
+    for root, dirs, files in os.walk(module_dir):
+        for file in files:
+            if file.endswith('.py'):
+                load_answer_functions_from_module(importlib.import_module(module_dir + '.' + file[:-3]))
 
 
 def distance(a, b):
@@ -33,50 +59,30 @@ def distance(a, b):
     return current_row[n]
 
 
-def answer_menu(args, answer):
-    answer.buttons = ({"value": "button_one", "label": "button_one"},
-                      {"value": "button_two", "label": "button_two"})
+def do_command(message):
+    params = message.split()
+    command = find_command(params[0])
+    args = list(params)[1:]
+
+    answer = Answer()
+
+    function_name = 'answer_' + command
+    try:
+        answer_function = answer_functions[function_name]
+        answer_function(args, answer)
+    except Exception as e:
+        answer.text = 'ERROR'
+        print('Call for {} failed'.format(function_name))
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_exception(exc_type, exc_value, exc_traceback)
+
+    return answer
 
 
-def answer_help(args, answer):
-    answer.text = "Я умный супермегабот. Набирай команды, постараюсь выполнить :=]"
-
-
-def answer_unknown(args, answer):
-    answer.text = "Не понял, чего тебе надо?"
-
-
-class Command(Enum):
-    NONE = 'unknown'
-    MENU = 'menu'
-    HELP = 'help'
-
-    @classmethod
-    def do(cls, message):
-        params = message.split()
-        command = Command.find(params[0])
-        args = list(params)[1:]
-
-        answer = Answer()
-
-        function_name = 'answer_' + command.value
-        try:
-            answer_function = globals()[function_name]
-            answer_function(args, answer)
-        except Exception as e:
-            answer.text = 'ERROR'
-            print('Call for {} failed'.format(function_name))
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(exc_type, exc_value, exc_traceback)
-
-        return answer
-
-
-    @classmethod
-    def find(cls, command):
-        lcommand = command.lower()
-        max_dist = int(math.log2(len(lcommand)))
-        for cmd_name in Command:
-            if distance(cmd_name.value, lcommand) <= max_dist:
-                return cmd_name
-        return Command.NONE
+def find_command(command):
+    lcommand = command.lower()
+    max_dist = int(math.log2(len(lcommand)))
+    for cmd_name in commands:
+        if distance(cmd_name, lcommand) <= max_dist:
+            return cmd_name
+    return COMMAND_UNKNOWN
