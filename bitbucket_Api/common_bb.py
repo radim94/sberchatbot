@@ -36,13 +36,17 @@ class State:
 if __name__ == '__main__':
 
     state = State()
-    print(stash.dashboard)
+    # print(stash.dashboard)
     print(stash.dashboard.pull_request.get())
     print(stash.dashboard.pull_request.list()[0])
     pr=PR_list()[0]
+    print(pr)
     state.repository = pr['fromRef']['repository']['slug']
     state.project = pr['fromRef']['repository']['project']['key']
     state.pull_request = pr['id']
-    # q=pull_requests[state.pull_request]
-    print(q.diff())
+
+    q=stash.projects[state.project].repos[state.repository].pull_requests[state.pull_request].issues()
+    print(list(q))
+    # print(list(x['comment']['author']['name']+':'+ x['comment']['text']for x in q if x['action']=='COMMENTED'))
+    # f'http://{}/rest/jira/1.0/projects/{project}/repos/{repo}/pull-requests/{pr_id}/issues''
     # q.merge(version=pr['version'])
