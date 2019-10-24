@@ -22,6 +22,8 @@ class User(Model):
     sigma_login = TextField()
 
     bitbucket_user_id = TextField()
+    bitbucket_user_token = TextField()
+
     jira_user_id = TextField()
     jenkins_user_id = TextField()
 
