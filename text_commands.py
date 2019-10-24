@@ -8,7 +8,8 @@ import traceback
 
 class Answer:
     text = None
-    buttons = ()  # ({value: "", label: ""})
+    buttons = dict()  # ({value: "", label: ""})
+    selects = tuple()
 
 
 def get_credentials(user_id):
@@ -74,7 +75,7 @@ def do_command(message, credentials):
 
     answer = Answer()
 
-    function_name = 'answer_' + command
+    function_name = ANSWER_PREFIX + command
     try:
         answer_function = answer_functions[function_name]
         answer_function(args, answer, credentials)
