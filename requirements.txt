@@ -6,4 +6,3 @@ dialog-bot-sdk
 jenkisapi
 requests
 stashy
-python-jenkins
