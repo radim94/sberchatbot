@@ -38,7 +38,7 @@ def on_message(msg_):
         answer = do_command(message,credentials=get_credentials(user.id))
 
         group = []
-        if answer.selects is not None:
+        if answer.selects is not None and answer.selects!=():
             group.append(add_interactive(answer.selects[1], answer.selects[0], type_='select'))
         group.extend([add_interactive(button['label'], button['value']) for button in answer.buttons])
 
@@ -60,6 +60,7 @@ def on_message(msg_):
 
 
 if __name__ == '__main__':
+    BITBUCKET_SERVER = "http://172.30.18.187:7990"
     load_answer_functions()
     bot = DialogBot.get_secure_bot(
         'hackathon-mob.transmit.im:443',

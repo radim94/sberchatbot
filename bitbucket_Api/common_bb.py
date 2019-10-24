@@ -1,7 +1,11 @@
 from dataclasses import dataclass
 from enum import Enum
 
+
+# from modules.bitbucket_API import BITBUCKET_SERVER
 import stashy
+
+BITBUCKET_SERVER = "http://172.30.18.187:7990"
 
 class Steps(Enum):
     REPO_LIST='REPO_LIST'
@@ -16,17 +20,17 @@ token = 'ODcyODIzMTY4NDE0Os0nGKYJTZm4ZM5/BnEg6ikmnFoO'
 user='admin'
 # token = '1'
 # user='1'
-stash = stashy.connect("http://172.30.18.187:7990", user,token)
+stash = stashy.connect(BITBUCKET_SERVER, user,token)
 stash
 print(stash.projects.list())
 def project_list(credentials):
-    stash=stashy.connect("http://172.30.18.187:7990", credentials['login'] ,credentials['password'])
+    stash=stashy.connect(BITBUCKET_SERVER, credentials['login'] ,credentials['password'])
     return stash.projects.list()
 def repo_list(proj,credentials):
-    stash = stashy.connect("http://172.30.18.187:7990", credentials['login'], credentials['password'])
+    stash = stashy.connect(BITBUCKET_SERVER, credentials['login'], credentials['password'])
     return stash.projects[proj].repos.list()
 def PR_list(credentials):
-    stash = stashy.connect("http://172.30.18.187:7990", credentials['login'], credentials['password'])
+    stash = stashy.connect(BITBUCKET_SERVER, credentials['login'], credentials['password'])
     return stash.dashboard.pull_request.list()
 
 @dataclass
