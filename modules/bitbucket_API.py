@@ -5,19 +5,19 @@ from stashy.pullrequests import PullRequest
 
 BITBUCKET_SERVER = "http://172.30.18.187:7990"
 
-def answer_help_bitbucket(args, answer, credentials):
+def answer_bitbucket(args, answer, credentials):
     answer.text='''available commands:
-    project_list -- get list of projects;
-    repo_list <PROJECT> -- get repos of selected project
-    get_pr -- get list available pull-request
+    projects -- get list of projects;
+    repo <PROJECT> -- get repos of selected project
+    pr -- get list available pull-request
     approve <PROJECT> <REPO> <PR> -- approve selected PR
     unapprove <PROJECT> <REPO> <PR> -- unapprove selected PR 
     decline <PROJECT> <REPO> <PR> -- decline selected PR 
     merge <PROJECT> <REPO> <PR> -- merge selected PR 
-    get_comments <PROJECT> <REPO> <PR> -- get comments for selected PR 
-    jira_task <PROJECT> <REPO> <PR> -- get linked jira task for selected PR 
+    pr comments <PROJECT> <REPO> <PR> -- get comments for selected PR 
+    pr tasks <PROJECT> <REPO> <PR> -- get linked jira task for selected PR 
     get_commits <PROJECT> <REPO> <PR> -- get commits of selected PR 
-    help_bitbucket -- this help
+    bitbucket -- this help
     '''
 
 def answer_projects(args, answer, credentials):
@@ -33,6 +33,10 @@ def answer_get(args,answer,credentials):
         answer_commits(args[1:],answer,credentials)
 
 def answer_pr(args, answer, credentials):
+    if args[0]=='comments':
+        return answer_comments(args[1:], answer, credentials)
+    if args[0]=='tasks':
+        return answer_jira_task(args[1:], answer, credentials)
     prs = [pr for pr in PR_list(credentials) if pr['state'] == 'OPEN']
     # answer.selects = ({str(index + 1): proj['title'] for index, proj in enumerate(prs)}, 'PRs')
     answer.text = '\n'.join(proj['title'] for proj in prs)
@@ -43,7 +47,7 @@ def answer_repo(args,answer,credentials):
 
 def answer_repositories(args, answer, credentials):
     if len(args)!=1:
-        answer.text='run repo_list <PROJECT>'
+        answer.text='run repo <PROJECT>'
         return
     try:
         pl = repo_list(args[0], credentials)
@@ -110,7 +114,7 @@ def answer_comments(args, answer, credentials):
     pr: PullRequest
     stash = stashy.connect(BITBUCKET_SERVER, credentials['login'], credentials['password'])
     if len(args) != 3:
-        answer.text = 'run get_comments <PROJECT> <REPO> <PR>'
+        answer.text = 'run pr comments <PROJECT> <REPO> <PR>'
         return
     try:
         pr = stash.projects[args[0]].repos[args[1]].pull_requests[args[2]]
@@ -124,7 +128,7 @@ def answer_jira_task(args, answer, credentials):
     pr: PullRequest
     stash = stashy.connect(BITBUCKET_SERVER, credentials['login'], credentials['password'])
     if len(args) != 3:
-        answer.text = 'run jira_task <PROJECT> <REPO> <PR>'
+        answer.text = 'run pr tasks <PROJECT> <REPO> <PR>'
         return
     try:
         pr = stash.projects[args[0]].repos[args[1]].pull_requests[args[2]]
