@@ -22,18 +22,18 @@ def get_init_message(state):
     if state.pull_request is not None:
         message += f'selected pull request:{state.pull_request}\n'
 
-    message += '1:select project\n'
+    # message += '1:select project\n'
     message_int = [add_interactive('project', "select project")]
 
-    message += '2: select PR\n'
+    # message += '2: select PR\n'
     message_int.append(add_interactive('PR', 'select PR'))
 
     if state.project is not None:
-        message += '3: select repository\n'
+        # message += '3: select repository\n'
         message_int.append(add_interactive("repo", 'select repository'))
 
     if state.pull_request is not None:
-        message += f'4: manage selected pull request \n'
+        # message += f'4: manage selected pull request \n'
         message_int.append(add_interactive('manage_PR', 'manage selected PR'))
 
     message += '0: exit\n'
@@ -88,7 +88,8 @@ def get_message_state(state, choise):
             int_answer = [
                 add_interactive('Projects',
                                 {str(index + 1): proj['key'] for index, proj in enumerate(pl)},
-                                type_='list')
+                                type_='list'),
+                add_interactive('back', 'back')
             ]
 
         if choise == 'PR':
@@ -115,9 +116,9 @@ def get_message_state(state, choise):
                           add_interactive('back', 'back')
                           ]
         if choise == 'exit':
-            state=State()
-            answer=' '
-            int_answer=[]
+            state = State()
+            answer = ' '
+            int_answer = []
             return get_message_state(state, choise)
     elif state.step == Steps.MANAGE_PR_OPTIONS:
         if choise != 'back' and choise != 'skip':
@@ -143,7 +144,7 @@ def get_message_state(state, choise):
         ]
 
         answer = '\n'.join(str(index + 1) + ' : ' + pr for index, pr in enumerate(ans))
-        answer=' '
+        answer = ' '
         int_answer = [add_interactive(proj, proj) for index, proj in enumerate(ans)]
 
         can_merge = stash.projects[state.project].repos[state.repository].pull_requests[state.pull_request].can_merge()
@@ -173,12 +174,19 @@ def get_message_state(state, choise):
         state.step = Steps.INIT
         return get_message_state(state, choise)
     elif state.step == Steps.PROJECT_LIST:
+        if choise == 'back':
+            state.step = Steps.INIT
+            return get_message_state(state, choise)
         choise = int(choise)
         if int(choise) > 0 and int(choise) <= len(state.project_list):
             state.project = state.project_list[choise - 1]['key']
             state.step = Steps.INIT
             return get_message_state(state, choise)
     elif state.step == Steps.REPO_LIST:
+        if choise == 'back':
+            state.step = Steps.INIT
+            return get_message_state(state, choise)
+
         choise = int(choise)
         if int(choise) > 0 and int(choise) <= len(state.project_list):
             state.repository = state.repo_list[choise - 1]['slug']
