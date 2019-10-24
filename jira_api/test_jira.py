@@ -1,11 +1,7 @@
 class JIRA_API:
 
-    def __init__(self, server, login, password):
-        try:
-            import jira
-        except ImportError:
-            raise IndexError('Install jira (pip install jira')
-        self.obj: jira.JIRA = jira.JIRA(server=server, basic_auth=(login, password))
+    def __init__(self, obj):
+        self.obj = obj
 
     def get_assigned_issue(self):
         user = self.obj.current_user()

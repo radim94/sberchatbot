@@ -33,7 +33,7 @@ COMMAND_UNKNOWN = 'unknown'
 def load_answer_functions_from_module(module):
     for name, obj in inspect.getmembers(module):
         if inspect.isclass(obj):
-            cls.load_answer_functions_from_module(obj)
+            load_answer_functions_from_module(obj)
         elif inspect.ismethod(obj) or inspect.isfunction(obj):
             if name.startswith(ANSWER_PREFIX):
                 answer_functions[name] = obj

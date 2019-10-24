@@ -1,10 +1,12 @@
 from jira_api.test_jira import JIRA_API
 from jira.exceptions import JIRAError
+from jira import JIRA
 
 
 def get_jira_obj(credentials):
-    return JIRA_API(server='http://172.30.18.111:8080',
-                    **credentials)
+    jira = JIRA(server='http://172.30.18.111:8080',
+                basic_auth=(credentials['login'], credentials['password']))
+    return JIRA_API(jira)
 
 
 def answer_tasks(args, answer, credentials):
@@ -53,4 +55,3 @@ def answer_assign(args, answer, credentials):
             return
         else:
             answer.text = f'Задача {task_key} назначена пользователю {whom}'
-
