@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify
+
+from src.prometheus.alertservice import AlertService
+
 """
 Тестовый рест-серви для получения алертов
 """
-
-
 
 app = Flask(__name__)
 
@@ -17,22 +18,10 @@ def alert1():
 
     alert = request.json
 
+    AlertService.process_alertmanager_message(alert)
 
-    print(alert)
-    pass
+    return " ok "
 
-@app.route('/alert', methods=['POST'])
-def alert():
-    """
-    Получени alert от alertmanager
-    :return:
-    """
-
-    alert = request.json
-
-
-    print(alert)
-    pass
 
 if __name__ == "__main__":
     app.run(port=7777)
