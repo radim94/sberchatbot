@@ -38,12 +38,13 @@ def on_msg1(*params):
     user = users_state.setdefault(params[0].peer.id, User(**user_data))
 
 
-    if user.state == 'START':
-        bot.messaging.send_message(
-            params[0].peer,
-            "JIRA",
-            JIRA_UI.get_start_buttons()
-        )
+    # if user.state == 'START':
+    #     pass
+    # bot.messaging.send_message(
+    #     params[0].peer,
+    #     "JIRA",
+    #     JIRA_UI.get_start_buttons()
+    # )
 
 
 def on_click(*params):

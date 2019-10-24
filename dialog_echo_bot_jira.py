@@ -169,42 +169,6 @@ def on_click(*params):
             f'Выбрать задачу:',
             JIRA_UI.show_issues(options)
         )
-    # if action == 'show_my_issue':
-    #     tasks = user.jira.get_assigned_issue()
-    #     bot.messaging.send_message(
-    #         bot.users.get_user_outpeer_by_id(params[0].uid),
-    #         'Tasks',
-    #         JIRA_UI.show_issues(tasks)
-    #     )
-    # elif action == 'select_task':
-    #     task_id = params[0].value
-    #     task_data = user.jira.get_issue_info(task_id)
-    #     transition = user.jira.get_issue_transition(task_id)
-    #     bot.messaging.send_message(
-    #         bot.users.get_user_outpeer_by_id(params[0].uid),
-    #         f'Task: {task_data["key"]}\n'
-    #         f'Summary: {task_data["summary"]}\n'
-    #         f'Description: {task_data["description"]}\n'
-    #         f'Status: {task_data["status"]}\n\n'
-    #         f'Для переназначения задачи введите команду assign <username>',
-    #         JIRA_UI.show_transition(transition)
-    #     )
-    #     user.task_id = task_id
-    # elif action == 'transition':
-    #     transition_id = params[0].value
-    #     task_data = user.jira.transition_issue(transition_id, user.task_id)
-    #     bot.messaging.send_message(
-    #         bot.users.get_user_outpeer_by_id(params[0].uid),
-    #         f'Task: {task_data["key"]}\n'
-    #         f'Summary: {task_data["summary"]}\n'
-    #         f'Description: {task_data["description"]}\n'
-    #         f'Status: {task_data["status"]}'
-    #     )
-    #     user.task_id = None
-
-    # if u_state == 'START'
-    # bot.users.get_user_outpeer_by_id(params[0].uid)
-    # bot.messaging.send_message(bot.users.get_user_outpeer_by_id(params[0].uid), params[0].value)
 
 
 if __name__ == '__main__':
@@ -213,5 +177,4 @@ if __name__ == '__main__':
         grpc.ssl_channel_credentials(),
         '86020643997976086d7cc80db129b4c1d4a0542c'
     )
-    # print(bot.users.get_user_full_profile_by_nick('asavt'))
     bot.messaging.on_message(on_msg1, on_click)

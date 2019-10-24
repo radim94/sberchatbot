@@ -1,7 +1,3 @@
-from pprint import pprint
-import re
-
-
 class JIRA_API:
 
     def __init__(self, server, login, password):
@@ -50,33 +46,3 @@ class JIRA_API:
             whom = self.obj.current_user()
         issue = self.obj.search_issues(f'key={issue_key}')[0]
         return self.obj.assign_issue(issue, whom)
-
-    def t(self):
-        user = self.obj.current_user()
-        # print(user)
-        # res = self.obj.search_issues('sprint in openSprints()')
-        # print(res)
-        res = self.obj.search_issues(f'assignee={user}')
-        pprint(dir(res[0].fields))
-        # pprint(res[0].fields.customfield_10105)
-        # print('sprint' in res[0].fields.customfield_10100)
-        # for sprint in res[0].fields.customfield_10000:
-            # sprint_name = re.findall(r"name=[^,]*", str(res[0].fields.customfield_10000[0]))
-            # print(sprint_name)
-            # print(sprint)
-            # pass
-
-        # pprint([(dir(x.fields), x.id, x.key, x.fields.customfield_10104) for x in res])
-        # pprint(self.obj.fields())
-
-
-if __name__ == '__main__':
-    jira_obj = JIRA_API(server='http://172.30.18.111:8080', login='1', password='1')
-    # pprint(jira_obj.get_projects())
-    # jira_obj.select_project(10000)
-    # pprint(jira_obj.get_issue_types())
-    jira_obj.t()
-    # pprint(jira_obj.create_issue('New task', 'Bug'))
-    # pprint(jira_obj.create_issue('New task', 'Bug').permalink())
-    # print(projects)
-    # pprint(meta['projects'])

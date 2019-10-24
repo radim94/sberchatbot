@@ -27,12 +27,6 @@ class JIRA_UI:
                 'select_task',
                 interactive_media.InteractiveMediaSelect(options, "Tasks")
             )]),
-            # interactive_media.InteractiveMediaGroup([
-            #     interactive_media.InteractiveMedia(
-            #         'back',
-            #         interactive_media.InteractiveMediaButton('back', 'Назад')
-            #     )
-            # ])
         ]
 
     @staticmethod
