@@ -17,6 +17,12 @@ def get_credentials(user_id):
         'login': '1',
         'password': '1'
     }
+def set_credentials(user_id,login,password):
+
+    return {
+        'login': '1',
+        'password': '1'
+    }
 
 
 def get_answer(message, user_id):

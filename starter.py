@@ -1,8 +1,10 @@
+from collections import defaultdict
+
 import grpc
 from dialog_bot_sdk import interactive_media
 from dialog_bot_sdk.bot import DialogBot
 
-from text_commands import load_answer_functions, do_command, get_credentials
+from text_commands import load_answer_functions, do_command, get_credentials, set_credentials
 
 
 def add_interactive(media_id, text, type_='button'):
@@ -28,14 +30,23 @@ def get_user_message(msg):
     return user, message
 
 
+user_states=defaultdict(int)
+
 def on_message(msg_):
     user, message = get_user_message(msg_)
-    # state = user_states[user.id]
+    state = user_states[user.id]
 
     # choise = get_choise(message, state)
-
+    if user_states[user.id]==1:
+        set_credentials(user.id,message.split()[0],message.split()[1])
+        user_states[user.id] == 0
     try:
-        answer = do_command(message,credentials=get_credentials(user.id))
+        credentials = get_credentials(user.id)
+        if credentials is None:
+            bot.messaging.send_message(user, 'input login and password (space separated)')
+            user_states[user.id]=1
+            return
+        answer = do_command(message,credentials=credentials)
 
         group = []
         if answer.selects:
