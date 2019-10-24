@@ -130,3 +130,7 @@ dmypy.json
 #idea files
 /.idea
 /.idea/*
+
+#idea
+.idea
+.idea/*
