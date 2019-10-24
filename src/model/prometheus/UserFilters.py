@@ -17,7 +17,7 @@ class AlertmanagerUserFilter(Model):
     id = AutoIncrementField(primary_key=True)
     user_id = IntegerField(index=True)
 
-    label = TextField(default="")
+    label = TextField(default="", index=True)
     include_values = PickledField(default=set())
     exclude_values = PickledField(default=set())
 
