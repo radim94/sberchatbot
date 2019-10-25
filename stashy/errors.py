@@ -1,6 +1,7 @@
 from functools import wraps
 from decorator import decorator
 
+
 class NotFoundException(Exception):
     def __init__(self, response):
         try:
@@ -31,9 +32,10 @@ class AuthenticationException(Exception):
         try:
             msg = "%d: Invalid User / Password" % response.status_code
         except ValueError:
-            msg = "Invalid Authentication" 
+            msg = "Invalid Authentication"
 
-        super(AuthenticationException,self).__init__(msg)
+        super(AuthenticationException, self).__init__(msg)
+
 
 def maybe_throw(response):
     if not response.ok:
