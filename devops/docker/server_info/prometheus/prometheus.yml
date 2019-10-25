@@ -9,7 +9,7 @@ scrape_configs:
       - targets:
           - 'localhost:9256'
 rule_files:
-  - './con.yml'
+  - './com.yml'
 alerting:
   alertmanagers:
     - static_configs:
