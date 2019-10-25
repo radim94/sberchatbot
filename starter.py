@@ -30,23 +30,24 @@ def get_user_message(msg):
     return user, message
 
 
-user_states=defaultdict(int)
+user_states = defaultdict(int)
+
 
 def on_message(msg_):
     user, message = get_user_message(msg_)
     state = user_states[user.id]
 
     # choise = get_choise(message, state)
-    if user_states[user.id]==1:
-        set_credentials(user.id,message.split()[0],message.split()[1])
-        user_states[user.id] == 0
+    if user_states[user.id] == 1:
+        set_credentials(user.id, message.split()[0], message.split()[1])
+        user_states[user.id] = 0
     try:
         credentials = get_credentials(user.id)
         if credentials is None:
             bot.messaging.send_message(user, 'input login and password (space separated)')
-            user_states[user.id]=1
+            user_states[user.id] = 1
             return
-        answer = do_command(message,credentials=credentials)
+        answer = do_command(message, credentials=credentials)
 
         group = []
         if answer.selects:
@@ -76,7 +77,7 @@ if __name__ == '__main__':
     bot = DialogBot.get_secure_bot(
         'hackathon-mob.transmit.im:443',
         grpc.ssl_channel_credentials(),
-        'c9c60f2d3ff65c01c4ca0ed340c1ea64d110af8a'
+        '86020643997976086d7cc80db129b4c1d4a0542c'
     )
     # print(bot.users.get_user_full_profile_by_nick('asavt'))
     bot.messaging.on_message(on_message, on_message)
