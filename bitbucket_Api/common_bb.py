@@ -4,7 +4,7 @@ from enum import Enum
 # from modules.bitbucket_API import BITBUCKET_SERVER
 import stashy
 
-BITBUCKET_SERVER = "http://172.30.18.187:7990"
+BITBUCKET_SERVER = "http://172.30.18.215:7990"
 
 
 class Steps(Enum):

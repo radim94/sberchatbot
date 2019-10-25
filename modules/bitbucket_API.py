@@ -1,9 +1,11 @@
+from pprint import pprint
+
 import stashy
 from bitbucket_Api.common_bb import project_list, PR_list, repo_list
 from stashy.errors import NotFoundException
 from stashy.pullrequests import PullRequest
 
-BITBUCKET_SERVER = "http://172.30.18.187:7990"
+BITBUCKET_SERVER = "http://172.30.18.215:7990"
 
 def answer_bitbucket(args, answer, credentials):
     answer.text='''available commands:
@@ -44,7 +46,10 @@ def answer_pr(args, answer, credentials):
             return 
     prs = [pr for pr in PR_list(credentials) if pr['state'] == 'OPEN']
     # answer.selects = ({str(index + 1): proj['title'] for index, proj in enumerate(prs)}, 'PRs')
-    answer.text = '\n'.join(proj['title'] for proj in prs)
+    answer.text = '\n'.join(
+        pr['fromRef']['repository']['slug']+' '+
+        pr['fromRef']['repository']['project']['key']+' '+
+        pr['title']+'('+str(pr['id'])+')' for pr in prs)
     return answer
 
 def answer_repo(args,answer,credentials):

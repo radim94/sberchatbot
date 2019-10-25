@@ -5,7 +5,7 @@ token = 'ODcyODIzMTY4NDE0Os0nGKYJTZm4ZM5/BnEg6ikmnFoO'
 user='admin'
 import requests
 class API:
-    def __init__(self,base_URL='172.30.18.187:7990'):
+    def __init__(self,base_URL='172.30.18.215:7990'):
         self.sess=requests.Session()
         self.sess.verify=False
         self.sess.auth=requests.auth.HTTPBasicAuth("admin",token)

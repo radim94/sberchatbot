@@ -5,6 +5,8 @@ import os
 import sys
 import traceback
 
+from stashy.errors import GenericException
+
 
 class Answer:
     text = None
@@ -86,11 +88,17 @@ def do_command(message, credentials):
     try:
         answer_function = answer_functions[function_name]
         answer_function(args, answer, credentials)
+    except GenericException as e:
+        answer.text = e.data['errors'][0]['message']
+        print('Call for {} failed'.format(function_name))
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_exception(exc_type, exc_value, exc_traceback)
     except Exception as e:
         answer.text = 'ERROR'
         print('Call for {} failed'.format(function_name))
         exc_type, exc_value, exc_traceback = sys.exc_info()
         traceback.print_exception(exc_type, exc_value, exc_traceback)
+
 
     return answer
 
