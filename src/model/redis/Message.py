@@ -1,6 +1,6 @@
 from walrus import *
 
-db = Database()
+db = Database(host='172.30.18.111')
 
 
 class Message(Model):

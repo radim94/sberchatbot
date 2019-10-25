@@ -2,7 +2,7 @@ from walrus import *
 
 from src.utils.lists import get_first_or_def
 
-db = Database()
+db = Database(host='172.30.18.111')
 
 
 class AlertmanagerUserFilter(Model):

@@ -57,18 +57,6 @@ def get_init_message(state):
     message_int = [add_interactive('metrics', "metrics")]
     message_int.append(add_interactive('notification', "alerts"))
 
-    # if state.subscribe is not None:
-    #     # message += '3: select repository\n'
-    #     message_int.append(add_interactive("repo", 'select repository'))
-    #
-    # if state.unsubscribe is not None:
-    #     # message += '3: select repository\n'
-    #     message_int.append(add_interactive("repo", 'select repository'))
-
-    # if state.pull_request is not None:
-    #     # message += f'4: manage selected pull request \n'
-    #     message_int.append(add_interactive('manage_PR', 'manage selected PR'))
-
     message += '0: exit\n'
     message_int.append(add_interactive('exit', 'exit'))
 
@@ -118,8 +106,6 @@ def get_message_state(state, choise):
 
             metrics = PrometheusLogicService.get_host_list()
             state.metrics = metrics
-            # pl = project_list()
-            # state.project_list = pl
             answer = " Get host metrics"
             int_answer = [
                 add_interactive('Choose host',

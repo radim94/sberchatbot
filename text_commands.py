@@ -22,6 +22,7 @@ def get_credentials(user_id):
         user = users[0]
 
         return {
+            'user_id':user.id,
             'login': user.login,
             'password': user.password
         }
