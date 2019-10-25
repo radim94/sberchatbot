@@ -2,6 +2,7 @@ import jenkins
 import random
 import string
 from jenkins_integrations.jenk2 import create_job
+from jenkins_integrations import jenk2
 
 JENKINS_SERVER = "http://172.30.18.110:8080"
 
@@ -21,9 +22,11 @@ def answer_get_jobs_count(args, answer, credentials):
 
 
 def answer_create_job(args, answer, credentials):
-    job_name, xml = args[0:2]
-    server = jenkins.Jenkins(JENKINS_SERVER, username=credentials['login'], password=credentials['password'])
-    server.create_job(job_name, xml)
+    job_name = args[0]
+    xml = " ".join(args[1:])
+    jenk2.create_job(job_name, xml, JENKINS_SERVER, username=credentials['login'], password=credentials['password'])
+    # server = jenkins.Jenkins(JENKINS_SERVER, username=credentials['login'], password=credentials['password'])
+    # server.create_job(job_name, xml)
     # FIXME
     answer.text = "Создали джобу, но это не точно, проверь сервер"
     return answer
