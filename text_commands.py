@@ -5,6 +5,8 @@ import os
 import sys
 import traceback
 
+from src.model.redis.User import User
+
 
 class Answer:
     text = None
@@ -13,11 +15,26 @@ class Answer:
 
 
 def get_credentials(user_id):
-    return {
-        'login': '1',
-        'password': '1'
-    }
-def set_credentials(user_id,login,password):
+    users = list(User.query(User.id == user_id))
+    if len(users) > 0:
+        user = users[0]
+
+        return {
+            'login': user.login,
+            'password': user.password
+        }
+    return None
+
+
+def set_credentials(user_id, login, password):
+    users = list(User.query(User.id == user_id))
+    if len(users) > 0:
+        user = User.load(users[0].id)
+        user.password = password
+        user.login = login
+        user.save()
+    else:
+        User.create(id=user_id, login=login, password=password)
 
     return {
         'login': '1',

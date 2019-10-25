@@ -13,6 +13,9 @@ class User(Model):
     chatid = TextField()
     phone = TextField(index=True)
 
+    password = TextField()
+    login = TextField()
+
     is_blocked = BooleanField(default=False)
 
     alpha_mail = TextField()
