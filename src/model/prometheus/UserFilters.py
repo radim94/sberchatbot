@@ -51,18 +51,3 @@ class AlertmanagerUserFilter(Model):
 
     def get_text_message(self):
         return self.label + " : " + str(self.include_values)
-
-
-if __name__ == "__main__":
-
-    test = {
-        # 'id':1,
-        "user_id": 1481,
-        'label': 'instance',
-        'include_values': {'localhost:9100'}
-    }
-
-    a = AlertmanagerUserFilter.create(**test)
-
-    for user in AlertmanagerUserFilter.query(AlertmanagerUserFilter.user_id == 1489):
-        print(user._data)
