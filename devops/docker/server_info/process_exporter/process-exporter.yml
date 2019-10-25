@@ -1,0 +1,25 @@
+#process_names:
+#  - name: "{% raw %}{{.Comm}}{% endraw %}"
+#    comm:
+#    - php
+
+process_names:
+  - name: "{{.Comm}}"
+    cmdline:
+      - '.+'
+  - comm:
+    - chromium-browse
+    - bash
+    - prometheus
+    - gvim
+    - docker
+    - testFalsk.py
+    - redis
+    - python
+    - python3
+  - exe:
+    - /sbin/upstart
+    - testFalsk.py
+    cmdline:
+    - --user
+      name: upstart:-user

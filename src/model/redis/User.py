@@ -7,11 +7,13 @@ class User(Model):
     __database__ = db
     __namespace__ = 'user'
 
-
     id = IntegerField(primary_key=True)
     name = TextField()
     chatid = TextField()
     phone = TextField(index=True)
+
+    password = TextField()
+    login = TextField()
 
     is_blocked = BooleanField(default=False)
 
@@ -28,17 +30,14 @@ class User(Model):
     jenkins_user_id = TextField()
 
     # Подписка должна задаваться условиями (список метрик, стенд, джоба\любые поля)
-    prometheus_subscription_list = ListField()
-
-
-
-
+    prometheus_subscription_list = PickledField(default=set())
+    alertmanaget_filters = PickledField(default=set())
 
 
 if __name__ == "__main__":
 
-    usr_dct = {'id':1481,
-        'name': 'test',
+    usr_dct = {'id': 1481,
+               'name': 'test',
                # 'chatid': 'test',
                # 'phone': 'test',
                'is_blocked': False,
@@ -48,10 +47,10 @@ if __name__ == "__main__":
                'sigma_login': 'test',
                'bitbucket_user_id': 'test',
                'jira_user_id': 'test',
-               'jenkins_user_id': 'test'}
+               'jenkins_user_id': 'test',
+               'alertmanaget_filters': []
+               }
     User.create(**usr_dct)
-
 
     for user in User.all():
         print(user._data)
-

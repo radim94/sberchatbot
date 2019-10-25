@@ -7,6 +7,8 @@ import traceback
 
 from stashy.errors import GenericException
 
+from src.model.redis.User import User
+
 
 class Answer:
     text = None
@@ -15,15 +17,26 @@ class Answer:
 
 
 def get_credentials(user_id):
-    return {
-        'login': '1',
-        'password': '1'
-    }
-def set_credentials(user_id,login,password):
-    return {
-        'login': '1',
-        'password': '1'
-    }
+    users = list(User.query(User.id == user_id))
+    if len(users) > 0:
+        user = users[0]
+
+        return {
+            'login': user.login,
+            'password': user.password
+        }
+    return None
+
+
+def set_credentials(user_id, login, password):
+    users = list(User.query(User.id == user_id))
+    if len(users) > 0:
+        user = User.load(users[0].id)
+        user.password = password
+        user.login = login
+        user.save()
+    else:
+        User.create(id=user_id, login=login, password=password)
 
 
 def get_answer(message, user_id):
@@ -98,7 +111,6 @@ def do_command(message, credentials):
         print('Call for {} failed'.format(function_name))
         exc_type, exc_value, exc_traceback = sys.exc_info()
         traceback.print_exception(exc_type, exc_value, exc_traceback)
-
 
     return answer
 

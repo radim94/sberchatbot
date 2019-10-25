@@ -39,3 +39,15 @@ services:
             - --config.file=/etc/alertmanager/config.yml
             - --storage.path=/alertmanager
         network_mode: host
+
+    process_exporter:
+        privileged: true
+        image: ncabatoff/process-exporter
+        volumes:
+            - ./process_exporter/process-exporter.yml:/config/process-exporter.yml
+            - /proc:/host/proc
+        command:
+            - '-config.path=/config/process-exporter.yml'
+            - '--procfs=/host/proc'
+        ports:
+            - 9256:9256
