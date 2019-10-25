@@ -2,11 +2,9 @@ from collections import defaultdict
 from dataclasses import dataclass
 from enum import Enum
 
-from dialog_api import peers_pb2
-from dialog_bot_sdk.bot import DialogBot
 import grpc
-import os
 from dialog_bot_sdk import interactive_media
+from dialog_bot_sdk.bot import DialogBot
 
 from src.model.prometheus.Metric import PrometheusLabels
 from src.model.prometheus.UserFilters import AlertmanagerUserFilter
@@ -53,7 +51,6 @@ def get_init_message(state):
     if state.host is not None:
         message += f'selected host:{state.host}\n'
 
-    # message += '1:select project\n'
     message_int = [add_interactive('metrics', "metrics")]
     message_int.append(add_interactive('notification', "alerts"))
 
@@ -122,7 +119,7 @@ def get_message_state(state, choise):
                 add_interactive('get_alerts', 'get alerts'),
                 add_interactive('subscribe', 'subscribe'),
                 add_interactive('unsubscribe', 'unsubscribe'),
-            add_interactive('subscriptions', 'subscriptions'),
+                add_interactive('subscriptions', 'subscriptions'),
 
                 add_interactive('back', 'back')
             ]
@@ -241,7 +238,6 @@ def get_message_state(state, choise):
         elif choise == 'back':
             state.step = PromSteps.INIT
             return get_message_state(state, choise)
-
 
     elif state.step == PromSteps.ALERT_subscribe:
         if choise != 'back' and choise != 'skip':
@@ -382,8 +378,6 @@ def on_message(msg_):
         print(e)
         bot.messaging.send_message(user, 'ERROR')
         raise e
-
-    # bot.messaging.send_message(user, '<a href="http://172.30.18.111:8080/browse/TEST-1">')
 
 
 if __name__ == '__main__':

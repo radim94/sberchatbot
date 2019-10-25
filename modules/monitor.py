@@ -8,7 +8,7 @@ def answer_host(args, answer, credentials=None):
     if len(args) == 0:
         answer.text = "ERROR"
     else:
-        arg_count = len(args)-1
+        arg_count = len(args) - 1
         uid = args[arg_count]
         hosts = user_hosts.get(uid, [])
         if arg_count == 0:
