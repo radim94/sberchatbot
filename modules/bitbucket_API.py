@@ -5,27 +5,49 @@ from stashy.pullrequests import PullRequest
 
 BITBUCKET_SERVER = "http://172.30.18.187:7990"
 
+def answer_bitbucket(args, answer, credentials):
+    answer.text='''available commands:
+    projects -- get list of projects;
+    repo <PROJECT> -- get repos of selected project
+    pr -- get list available pull-request
+    approve <PROJECT> <REPO> <PR> -- approve selected PR
+    unapprove <PROJECT> <REPO> <PR> -- unapprove selected PR 
+    decline <PROJECT> <REPO> <PR> -- decline selected PR 
+    merge <PROJECT> <REPO> <PR> -- merge selected PR 
+    pr comments <PROJECT> <REPO> <PR> -- get comments for selected PR 
+    pr tasks <PROJECT> <REPO> <PR> -- get linked jira task for selected PR 
+    get_commits <PROJECT> <REPO> <PR> -- get commits of selected PR 
+    bitbucket -- this help
+    '''
 
-def answer_project_list(args, answer, credentials):
+def answer_projects(args, answer, credentials):
     pl = project_list(credentials)
     # answer.selects = ({str(index + 1): proj['key'] for index, proj in enumerate(pl)}, 'Projects')
     answer.text = '\n'.join(proj['key'] for proj in pl)
     return answer
 
+def answer_get(args,answer,credentials):
+    if args[0]=='comment':
+        answer_comments(args[1:],answer,credentials)
+    elif args[0]=='commit':
+        answer_commits(args[1:],answer,credentials)
 
-def answer_get_pr(args, answer, credentials):
+def answer_pr(args, answer, credentials):
+    if args[0]=='comments':
+        return answer_comments(args[1:], answer, credentials)
+    if args[0]=='tasks':
+        return answer_jira_task(args[1:], answer, credentials)
     prs = [pr for pr in PR_list(credentials) if pr['state'] == 'OPEN']
     # answer.selects = ({str(index + 1): proj['title'] for index, proj in enumerate(prs)}, 'PRs')
     answer.text = '\n'.join(proj['title'] for proj in prs)
     return answer
 
 def answer_repo(args,answer,credentials):
-    if args[0]=='list':
-        answer_repo_list(args[1:],answer,credentials)
+    answer_repositories(args[1:],answer,credentials)
 
-def answer_repo_list(args, answer, credentials):
+def answer_repositories(args, answer, credentials):
     if len(args)!=1:
-        answer.text='run repo_list <PROJECT>'
+        answer.text='run repo <PROJECT>'
         return
     try:
         pl = repo_list(args[0], credentials)
@@ -47,9 +69,6 @@ def answer_approve(args, answer, credentials):
         answer.text='PR approved'
     except NotFoundException:
         answer.text = f'project {args[0]} not found'
-
-
-
 
 def answer_decline(args, answer, credentials):
     pr: PullRequest
@@ -77,7 +96,6 @@ def answer_merge(args, answer, credentials):
     except NotFoundException:
         answer.text = f'project {args[0]} not found'
 
-
 def answer_unapprove(args, answer, credentials):
     pr: PullRequest
     stash = stashy.connect(BITBUCKET_SERVER, credentials['login'], credentials['password'])
@@ -92,11 +110,11 @@ def answer_unapprove(args, answer, credentials):
     except NotFoundException:
         answer.text = f'project {args[0]} not found'
 
-def answer_get_comment(args, answer, credentials):
+def answer_comments(args, answer, credentials):
     pr: PullRequest
     stash = stashy.connect(BITBUCKET_SERVER, credentials['login'], credentials['password'])
     if len(args) != 3:
-        answer.text = 'run get_comments <PROJECT> <REPO> <PR>'
+        answer.text = 'run pr comments <PROJECT> <REPO> <PR>'
         return
     try:
         pr = stash.projects[args[0]].repos[args[1]].pull_requests[args[2]]
@@ -106,12 +124,11 @@ def answer_get_comment(args, answer, credentials):
     except NotFoundException:
         answer.text = f'project {args[0]} not found'
 
-
 def answer_jira_task(args, answer, credentials):
     pr: PullRequest
     stash = stashy.connect(BITBUCKET_SERVER, credentials['login'], credentials['password'])
     if len(args) != 3:
-        answer.text = 'run jira_task <PROJECT> <REPO> <PR>'
+        answer.text = 'run pr tasks <PROJECT> <REPO> <PR>'
         return
     try:
         pr = stash.projects[args[0]].repos[args[1]].pull_requests[args[2]]
@@ -119,8 +136,7 @@ def answer_jira_task(args, answer, credentials):
     except NotFoundException:
         answer.text = f'project {args[0]} not found'
 
-
-def answer_get_commit(args, answer, credentials):
+def answer_commits(args, answer, credentials):
     pr: PullRequest
     stash = stashy.connect(BITBUCKET_SERVER, credentials['login'], credentials['password'])
     if len(args) != 3:
@@ -131,6 +147,21 @@ def answer_get_commit(args, answer, credentials):
         answer.text = '\n'.join(x['author']['name'] + '  :  ' + x['displayId'] for x in pr.commits())
     except NotFoundException:
         answer.text = f'project {args[0]} not found'
+
+def answer_new_comment(args, answer, credentials):
+    pr: PullRequest
+    stash = stashy.connect(BITBUCKET_SERVER, credentials['login'], credentials['password'])
+    if len(args) != 4:
+        answer.text = 'run write_comment <PROJECT> <REPO> <PR> <COMMENT>'
+        return
+    try:
+        pr = stash.projects[args[0]].repos[args[1]].pull_requests[args[2]]
+        pr.comment(' '.join(args[3:]))
+    except NotFoundException:
+        answer.text = f'project {args[0]} not found'
+
+
+
 
 
 
