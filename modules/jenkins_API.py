@@ -3,7 +3,7 @@ import random
 import string
 from jenkins_integrations.jenk2 import create_job
 
-JENKINS_SERVER = "172.30.18.110:8080"
+JENKINS_SERVER = "http://172.30.18.110:8080"
 
 
 def answer_hello_user(args, answer, credentials):
@@ -21,7 +21,7 @@ def answer_get_jobs_count(args, answer, credentials):
 
 
 def answer_create_job(args, answer, credentials):
-    job_name, xml = args[0:1]
+    job_name, xml = args[0:2]
     server = jenkins.Jenkins(JENKINS_SERVER, username=credentials['login'], password=credentials['password'])
     server.create_job(job_name, xml)
     # FIXME
@@ -48,7 +48,7 @@ def answer_build_job(args, answer, credentials):
     job_name = args[0]
     server = jenkins.Jenkins(JENKINS_SERVER, username=credentials['login'], password=credentials['password'])
     num = server.build_job(job_name)
-    answer.text = 'Джоба сбилджена, номер билда: '+ str(num)
+    answer.text = 'Джоба сбилджена, номер билда: ' + str(num)
     return answer
 
 
@@ -61,7 +61,7 @@ def answer_disable_job(args, answer, credentials):
 
 
 def answer_copy_job(args, answer, credentials):
-    job_source_name, new_job_name = args[0:1]
+    job_source_name, new_job_name = args[0:2]
     server = jenkins.Jenkins(JENKINS_SERVER, username=credentials['login'], password=credentials['password'])
     server.copy_job(job_source_name, new_job_name)
     answer.text = 'Джоба %s скопирована в джобу %s' % (job_source_name, new_job_name)
@@ -77,7 +77,7 @@ def answer_enable_job(args, answer, credentials):
 
 
 def answer_update_job(args, answer, credentials):
-    job_name, new_xml = args[0:1]
+    job_name, new_xml = args[0:2]
     server = jenkins.Jenkins(JENKINS_SERVER, username=credentials['login'], password=credentials['password'])
     server.reconfig_job(job_name, new_xml)
     answer.text = 'Джоба %s обновлена' % job_name
@@ -88,7 +88,7 @@ def answer_delete_job(args, answer, credentials):
     job_name = args[0]
     server = jenkins.Jenkins(JENKINS_SERVER, username=credentials['login'], password=credentials['password'])
     server.delete_job(job_name)
-    answer.text = 'Джоба %s обновлена' % job_name
+    answer.text = 'Джоба %s удалена' % job_name
     return answer
 
 
@@ -102,7 +102,7 @@ def answer_get_jobs_from_view(args, answer, credentials):
 
 def answer_build_parametrized_job(args, answer, credentials):
     server = jenkins.Jenkins(JENKINS_SERVER, username=credentials['login'], password=credentials['password'])
-    job_name, params_dict = args[0:1]
+    job_name, params_dict = args[0:2]
     #server.build_job('api-test', {'param1': 'test value 1', 'param2': 'test value 2'})
     num = server.build_job(job_name, params_dict)
     answer.text = 'Параметризованная джоба сбилджена, номер билда: ' + str(num)
@@ -118,7 +118,7 @@ def answer_get_last_completed_build_number(args, answer, credentials):
 
 
 def answer_get_build_info_by_build_number(args, answer, credentials):
-    job_name, build_number = args[0:1]
+    job_name, build_number = args[0:2]
     server = jenkins.Jenkins(JENKINS_SERVER, username=credentials['login'], password=credentials['password'])
     build_info = server.get_build_info(job_name, build_number)
     answer.text = 'Информация о билде номер %s джобы %s: ' % (build_number, job_name) + str(build_info)
@@ -126,9 +126,9 @@ def answer_get_build_info_by_build_number(args, answer, credentials):
 
 
 def answer_get_simple_build_job(args, answer, credentials):
-    bitbucket_host, branch_name, bitbucket_login, bitbucket_password, job_name = args[0:4]
+    bitbucket_host, branch_name, bitbucket_login, bitbucket_password, job_name = args[0:5]
     key=randomString(10)
-    create_credentials(key,bitbucket_login, bitbucket_password, JENKINS_SERVER, credentials['login'], credentials['password'])
+    create_credentials(key, bitbucket_login, bitbucket_password, JENKINS_SERVER, credentials['login'], credentials['password'])
     json = get_credentials_encrypted_token(key, bitbucket_host, JENKINS_SERVER, credentials['login'], credentials['password'])
     xml = create_simple_xml_for_build(bitbucket_host, key, branch_name)
     create_job(job_name, xml, JENKINS_SERVER, credentials['login'], credentials['password'])
