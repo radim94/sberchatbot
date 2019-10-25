@@ -19,7 +19,7 @@ class Alert(object):
         return self.get_text_message()
 
     def get_text_message(self):
-        return self.annotations.get("summary", self.annotations.get("description", ""))
+        return self.startsAt.split(".")[0] + " - " + self.annotations.get("summary", self.annotations.get("description", ""))
 
 alertd = {
     "status": "firing",
