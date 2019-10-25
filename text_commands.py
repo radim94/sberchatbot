@@ -36,11 +36,6 @@ def set_credentials(user_id, login, password):
     else:
         User.create(id=user_id, login=login, password=password)
 
-    return {
-        'login': '1',
-        'password': '1'
-    }
-
 
 def get_answer(message, user_id):
     credentials = get_credentials(user_id)
