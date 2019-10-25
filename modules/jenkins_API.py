@@ -80,7 +80,8 @@ def answer_enable_job(args, answer, credentials):
 
 
 def answer_update_job(args, answer, credentials):
-    job_name, new_xml = args[0:2]
+    job_name = args[0]
+    new_xml = " ".join(args[1:])
     server = jenkins.Jenkins(JENKINS_SERVER, username=credentials['login'], password=credentials['password'])
     server.reconfig_job(job_name, new_xml)
     answer.text = 'Джоба %s обновлена' % job_name
@@ -131,7 +132,7 @@ def answer_get_build_info_by_build_number(args, answer, credentials):
 def answer_get_simple_build_job(args, answer, credentials):
     bitbucket_host, branch_name, bitbucket_login, bitbucket_password, job_name = args[0:5]
     key=randomString(10)
-    create_credentials(key, bitbucket_login, bitbucket_password, JENKINS_SERVER, credentials['login'], credentials['password'])
+    create_credentials(key, bitbucket_host, bitbucket_login,  bitbucket_password, JENKINS_SERVER, credentials['login'], credentials['password'])
     json = get_credentials_encrypted_token(key, bitbucket_host, JENKINS_SERVER, credentials['login'], credentials['password'])
     xml = create_simple_xml_for_build(bitbucket_host, key, branch_name)
     create_job(job_name, xml, JENKINS_SERVER, credentials['login'], credentials['password'])
@@ -155,7 +156,7 @@ def create_credentials(credential_id, bitbucket_host, bitbucket_username, bitbuc
         <password>%(password)s</password>
     </com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl>
     """ % table
-    print(xml)
+    print('XML', xml)
     server.create_credential(bitbucket_host, xml)
 
 def get_credentials_encrypted_token(credential_id, bitbucket_host, host, username, password):
