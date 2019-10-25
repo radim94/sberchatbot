@@ -19,8 +19,8 @@ class PromSteps(Enum):
 
     GET_HOST_METRICS = "GET_HOST_METRICS"
     ALERT_MAIN = "ALERT_MAIN"
-    ALERT_ADD_NOTIFICATION = "ALERT_ADD_NOTIFICATION"
-    ALERT_DEL_NOTIFICATION = "ALERT_DEL_NOTIFICATION"
+    ALERT_subscribe = "ALERT_subscribe"
+    ALERT_unsubscribe = "ALERT_unsubscribe"
     ALERT_GET_RULES = "ALERT_GET_RULES"
     ALERT_PUSH = "ALERT_PUSH"
 
@@ -42,7 +42,7 @@ class PromState:
     pull_request: str = None
     step: str = PromSteps.INIT
     user_id = None
-    hosts = list()
+    metrics = list()
 
 
 user_states = defaultdict(PromState)
@@ -54,14 +54,14 @@ def get_init_message(state):
         message += f'selected host:{state.host}\n'
 
     # message += '1:select project\n'
-    message_int = [add_interactive('hosts', "hosts")]
-    message_int.append(add_interactive('notification', "manage notification"))
+    message_int = [add_interactive('metrics', "metrics")]
+    message_int.append(add_interactive('notification', "alerts"))
 
-    # if state.add_notification is not None:
+    # if state.subscribe is not None:
     #     # message += '3: select repository\n'
     #     message_int.append(add_interactive("repo", 'select repository'))
     #
-    # if state.del_notification is not None:
+    # if state.unsubscribe is not None:
     #     # message += '3: select repository\n'
     #     message_int.append(add_interactive("repo", 'select repository'))
 
@@ -113,17 +113,17 @@ def get_message_state(state, choise):
         answer, int_answer = get_init_message(state)
         state.step = PromSteps.START
     elif state.step == PromSteps.START:
-        if choise == 'hosts':
+        if choise == 'metrics':
             state.step = PromSteps.GET_HOST_METRICS
 
-            hosts = PrometheusLogicService.get_host_list()
-            state.hosts = hosts
+            metrics = PrometheusLogicService.get_host_list()
+            state.metrics = metrics
             # pl = project_list()
             # state.project_list = pl
             answer = " Get host metrics"
             int_answer = [
                 add_interactive('Choose host',
-                                {str(index + 1): host for index, host in enumerate(hosts)},
+                                {str(index + 1): host for index, host in enumerate(metrics)},
                                 type_='list'),
                 add_interactive('back', 'back')
             ]
@@ -133,10 +133,10 @@ def get_message_state(state, choise):
 
             answer = " "
             int_answer = [
-                add_interactive('get_notification', 'get_notification'),
-                add_interactive('add_notification', 'add_notification'),
-                add_interactive('del_notification', 'del_notification'),
-            add_interactive('get_notification_rules', 'get_notification_rules'),
+                add_interactive('get_alerts', 'get alerts'),
+                add_interactive('subscribe', 'subscribe'),
+                add_interactive('unsubscribe', 'unsubscribe'),
+            add_interactive('subscriptions', 'subscriptions'),
 
                 add_interactive('back', 'back')
             ]
@@ -149,8 +149,8 @@ def get_message_state(state, choise):
         if choise != 'back' and choise != 'skip':
             choise = int(choise)
 
-            if choise > 0 and choise <= len(state.hosts):
-                host = state.hosts[choise - 1]
+            if choise > 0 and choise <= len(state.metrics):
+                host = state.metrics[choise - 1]
 
                 host_metrics = str(PrometheusLogicService.get_host_status(host))
 
@@ -164,7 +164,7 @@ def get_message_state(state, choise):
 
         int_answer = [
             add_interactive('Choose host',
-                            {str(index + 1): host for index, host in enumerate(state.hosts)},
+                            {str(index + 1): host for index, host in enumerate(state.metrics)},
                             type_='list'),
             add_interactive('back', 'back')
         ]
@@ -173,8 +173,8 @@ def get_message_state(state, choise):
         if choise != 'back' and choise != 'skip':
             choise = int(choise)
 
-            if choise > 0 and choise <= len(state.hosts):
-                host = state.hosts[choise - 1]
+            if choise > 0 and choise <= len(state.metrics):
+                host = state.metrics[choise - 1]
 
                 host_metrics = str(PrometheusLogicService.get_host_status(host))
 
@@ -188,56 +188,56 @@ def get_message_state(state, choise):
 
         int_answer = [
             add_interactive('Choose host',
-                            {str(index + 1): host for index, host in enumerate(state.hosts)},
+                            {str(index + 1): host for index, host in enumerate(state.metrics)},
                             type_='list'),
             add_interactive('back', 'back')
         ]
 
     elif state.step == PromSteps.ALERT_MAIN:
         if choise != 'back' and choise != 'skip':
-            if choise == "add_notification":
-                state.step = PromSteps.ALERT_ADD_NOTIFICATION
+            if choise == "subscribe":
+                state.step = PromSteps.ALERT_subscribe
 
-                hosts = PrometheusLogicService.get_host_list()
+                metrics = PrometheusLogicService.get_host_list()
 
                 answer = "Choose host to subscribe on alerts"
                 int_answer = [
                     add_interactive('Choose host',
-                                    {str(index + 1): host for index, host in enumerate(hosts)},
+                                    {str(index + 1): host for index, host in enumerate(metrics)},
                                     type_='list'),
                     add_interactive('back', 'back')
                 ]
-            elif choise == "del_notification":
-                state.step = PromSteps.ALERT_DEL_NOTIFICATION
+            elif choise == "unsubscribe":
+                state.step = PromSteps.ALERT_unsubscribe
 
-                hosts = PrometheusLogicService.get_host_list()  # TODO СПисок отфильтрованный по юзеру
+                metrics = PrometheusLogicService.get_host_list()  # TODO СПисок отфильтрованный по юзеру
 
                 answer = "Choose host to unsubscribe on alerts"
                 int_answer = [
                     add_interactive('Choose host',
-                                    {str(index + 1): host for index, host in enumerate(hosts)},
+                                    {str(index + 1): host for index, host in enumerate(metrics)},
                                     type_='list'),
                     add_interactive('back', 'back')
                 ]
                 # TODO filter by user
-            elif choise == "get_notification":
+            elif choise == "get_alerts":
                 state.step = PromSteps.ALERT_MAIN
 
-                # hosts = PrometheusLogicService.get_host_list()
+                # metrics = PrometheusLogicService.get_host_list()
 
                 alerts = PrometheusLogicService.get_alert_list()
 
                 answer = "Alerts: \n"
                 answer += "\n".join(list(set([str(alert) for alert in alerts])))
                 int_answer = [
-                    add_interactive('get_notification', 'get_notification'),
-                    add_interactive('add_notification', 'add_notification'),
-                    add_interactive('del_notification', 'del_notification'),
-                    add_interactive('get_notification_rules', 'get_notification_rules'),
+                    add_interactive('get_alerts', 'get alerts'),
+                    add_interactive('subscribe', 'subscribe'),
+                    add_interactive('unsubscribe', 'unsubscribe'),
+                    add_interactive('subscriptions', 'subscriptions'),
                     add_interactive('back', 'back')
                 ]
 
-            elif choise == "get_notification_rules":
+            elif choise == "subscriptions":
                 state.step = PromSteps.ALERT_MAIN
 
                 answer = "Notification rules \n"
@@ -246,10 +246,10 @@ def get_message_state(state, choise):
                     AlertmanagerUserFilter.query(AlertmanagerUserFilter.user_id == state.user_id))])
 
                 int_answer = [
-                    add_interactive('get_notification', 'get_notification'),
-                    add_interactive('add_notification', 'add_notification'),
-                    add_interactive('del_notification', 'del_notification'),
-                    add_interactive('get_notification_rules', 'get_notification_rules'),
+                    add_interactive('get_alerts', 'get alerts'),
+                    add_interactive('subscribe', 'subscribe'),
+                    add_interactive('unsubscribe', 'unsubscribe'),
+                    add_interactive('subscriptions', 'subscriptions'),
                     add_interactive('back', 'back')
                 ]
         elif choise == 'back':
@@ -257,13 +257,13 @@ def get_message_state(state, choise):
             return get_message_state(state, choise)
 
 
-    elif state.step == PromSteps.ALERT_ADD_NOTIFICATION:
+    elif state.step == PromSteps.ALERT_subscribe:
         if choise != 'back' and choise != 'skip':
             choise = int(choise)
-            state.hosts = PrometheusLogicService.get_host_list()
+            state.metrics = PrometheusLogicService.get_host_list()
 
-            if choise > 0 and choise <= len(state.hosts):
-                host = state.hosts[choise - 1]
+            if choise > 0 and choise <= len(state.metrics):
+                host = state.metrics[choise - 1]
 
                 AlertmanagerUserFilter.update_or_create(user_id=state.user_id, label=PrometheusLabels.INSTANCE,
                                                         include_value=host)
@@ -277,19 +277,19 @@ def get_message_state(state, choise):
 
         answer = " "
         int_answer = [
-            add_interactive('get_notification', 'get_notification'),
-            add_interactive('add_notification', 'add_notification'),
-            add_interactive('del_notification', 'del_notification'),
-            add_interactive('get_notification_rules', 'get_notification_rules'),
+            add_interactive('get_alerts', 'get alerts'),
+            add_interactive('subscribe', 'subscribe'),
+            add_interactive('unsubscribe', 'unsubscribe'),
+            add_interactive('subscriptions', 'subscriptions'),
             add_interactive('back', 'back')
         ]
 
-    elif state.step == PromSteps.ALERT_DEL_NOTIFICATION:
+    elif state.step == PromSteps.ALERT_unsubscribe:
         if choise != 'back' and choise != 'skip':
             choise = int(choise)
 
-            if choise > 0 and choise <= len(state.hosts):
-                host = state.hosts[choise - 1]
+            if choise > 0 and choise <= len(state.metrics):
+                host = state.metrics[choise - 1]
 
                 AlertmanagerUserFilter.del_label_value(user_id=state.user_id, label=PrometheusLabels.INSTANCE,
                                                        include_value=host)
@@ -304,10 +304,10 @@ def get_message_state(state, choise):
 
         answer = " "
         int_answer = [
-            add_interactive('get_notification', 'get_notification'),
-            add_interactive('add_notification', 'add_notification'),
-            add_interactive('del_notification', 'del_notification'),
-            add_interactive('get_notification_rules', 'get_notification_rules'),
+            add_interactive('get_alerts', 'get alerts'),
+            add_interactive('subscribe', 'subscribe'),
+            add_interactive('unsubscribe', 'unsubscribe'),
+            add_interactive('subscriptions', 'subscriptions'),
             add_interactive('back', 'back')
         ]
 
@@ -324,7 +324,7 @@ def get_message_state(state, choise):
         #
         # int_answer = [
         #     add_interactive('Choose host',
-        #                     {str(index + 1): host for index, host in enumerate(state.hosts)},
+        #                     {str(index + 1): host for index, host in enumerate(state.metrics)},
         #                     type_='list'),
         #     add_interactive('back', 'back')
         # ]
