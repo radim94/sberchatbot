@@ -85,31 +85,5 @@ class AlertSubscService():
             filt = AlertmanagerUserFilter.load(filt.id)
 
             filt.include_values.remove(value)
-            #
-            # if (value in filt.exclude_values):
-            #     filt.exclude_values.remove(value)
-
             filt.save()
 
-
-if __name__ == "__main__":
-    # AlertSubscService.subscribe_to_alert(1489, ServerLabels.INSTANCE, "localhost:9100")
-    #
-    # fl = list(AlertmanagerUserFilter.all())
-    #
-    # print(fl)
-    # for f in fl:
-    #     print(f._data)
-    #
-    # AlertSubscService.unsubscribe_to_alert(1489, ServerLabels.INSTANCE, "localhost:9100")
-    #
-    # fl = list(AlertmanagerUserFilter.all())
-    #
-    # print(fl)
-    # for f in fl:
-    #     print(f._data)
-
-    # print(PrometheusLogicService.get_host_status("localhost:9100"))
-
-
-    print(PrometheusLogicService.get_alert_list({ServerLabels.INSTANCE: "localhost:9100"}))

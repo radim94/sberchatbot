@@ -10,7 +10,3 @@ class AlertWrapper(object):
         self.alert = alert
         self.user_id_list = user_id_list
         self.__dict__.update(entries)
-
-
-
-        return
